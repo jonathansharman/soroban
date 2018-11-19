@@ -1,0 +1,59 @@
+import Graphics2D;
+import Graphics2DText;
+
+const TOGGLE_FONT_SIZE = 16;
+const TOGGLE_BORDER = 1;
+
+class Toggle : UI {
+	static field font;
+
+	static constructor() {
+		Toggle.font = FontResource.fromSystem("Times New Roman").getRenderer().setColor(0, 0, 0).setSize(TOGGLE_FONT_SIZE);
+	}
+
+	field enableImage;
+	field disableImage;
+	field on = false;
+	field hovered;
+
+	field hotkey = null;
+
+	constructor(x, y, width, height, enableText, disableText)
+		: base(x, y, width, height)
+	{
+		this.disableImage = Toggle.font.render(disableText);
+		this.enableImage = Toggle.font.render(enableText);
+	}
+
+	function subupdate(inputManager, events) {
+		if (inputManager.didMouseClickHere(this.x, this.y, this.width, this.height)) {
+			this.on = !this.on;
+			Sounds.click.play();
+		}
+		if (this.hotkey != null && inputManager.isKeyPressedThisFrame(this.hotkey)) {
+			this.on = !this.on;
+			Sounds.click.play();
+		}
+		this.hovered = inputManager.isMouseOver(this.x, this.y, this.width, this.height);
+	}
+
+	function subdraw() {
+		// Draw border.
+		Graphics2D.Draw.rectangle(this.x, this.y, this.width, this.height, 0, 0, 0);
+
+		// Draw background.
+		color = this.hovered ? [212, 212, 212] : [160, 160, 160];
+		Graphics2D.Draw.rectangle
+			( this.x + TOGGLE_BORDER, this.y + TOGGLE_BORDER
+			, this.width - 2 * TOGGLE_BORDER, this.height - 2 * TOGGLE_BORDER
+			, color[0], color[1], color[2]
+			);
+
+		// Draw foreground.
+		image = this.on ? this.disableImage : this.enableImage;
+		image.draw
+			( this.x + (this.width - image.width) / 2
+			, this.y + (this.height - image.height) / 2
+			);
+	}
+}

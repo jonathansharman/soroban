@@ -1,0 +1,84 @@
+import Graphics2D;
+import Graphics2DText;
+import Math;
+import TwoCansAlpha2;
+
+const ROD_WIDTH = 6;
+const BEAD_WIDTH = 34;
+const BEAD_HEIGHT = 20;
+const RECKONING_BAR_HEIGHT = 10;
+
+const ROD_HEIGHT = 7 * BEAD_HEIGHT + RECKONING_BAR_HEIGHT;
+
+class Rod : UI {
+	field heavenBead;
+	field earthBeads;
+
+	field clicked = false;
+
+	constructor(x, y)
+		: base(x, y, BEAD_WIDTH, 7 * BEAD_HEIGHT + RECKONING_BAR_HEIGHT)
+	{
+		this.clear();
+	}
+
+	function value() {
+		return this.earthBeads + (this.heavenBead ? 5 : 0);
+	}
+
+	function clear() {
+		this.heavenBead = false;
+		this.earthBeads = 0;
+	}
+
+	function setHeavenBead(on) {
+		if (this.heavenBead != on) {
+			Sounds.click.play();
+			this.heavenBead = on;
+		}
+	}
+
+	function setEarthBeads(amount) {
+		oldEarthBeads = this.earthBeads;
+		this.earthBeads = Math.max(0, Math.min(4, amount));
+		if (this.earthBeads != oldEarthBeads) {
+			Sounds.click.play();
+		}
+	}
+
+	function addEarthBeads(amount) {
+		this.setEarthBeads(this.earthBeads + amount);
+	}
+
+	function subupdate(inputManager, events) {
+		this.clicked = false;
+		if (inputManager.didMouseClickHere(this.x, this.y, this.width, BEAD_HEIGHT)) {
+			this.clicked = true;
+			this.setHeavenBead(true);
+		} else if (inputManager.didMouseClickHere(this.x, this.y + BEAD_HEIGHT, this.width, BEAD_HEIGHT)) {
+			this.clicked = true;
+			this.setHeavenBead(false);
+		} else if (inputManager.didMouseClickHere(this.x, this.y + 2 * BEAD_HEIGHT + RECKONING_BAR_HEIGHT, this.width, 5 * BEAD_HEIGHT)) {
+			this.clicked = true;
+			this.setEarthBeads(4 - (this.y + ROD_HEIGHT - inputManager.getMousePosition()[1] - 1) / BEAD_HEIGHT);
+		}
+	}
+
+	function subdraw() {
+		// Draw rod.
+		Images.get("rod.png").draw(this.x + (BEAD_WIDTH - ROD_WIDTH) / 2, this.y);
+
+		// Draw heaven bead.
+		Images.get("bead.png").draw(this.x, this.y + (this.heavenBead ? BEAD_HEIGHT : 0));
+
+		// Draw reckoning bar.
+		Images.get("reckoning.png").draw(this.x, this.y + 2 * BEAD_HEIGHT);
+
+		// Draw earth beads.
+		for (i = 0; i < 5; ++i) {
+			if (i != this.earthBeads) {
+				Images.get("bead.png").draw(this.x, this.y + RECKONING_BAR_HEIGHT + (2 + i) * BEAD_HEIGHT);
+			}
+		}
+	}
+}

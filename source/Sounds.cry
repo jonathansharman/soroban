@@ -1,0 +1,5 @@
+import Audio;
+
+class Sounds {
+	static field click = Audio.SoundResource.loadFromResource("click.ogg");
+}

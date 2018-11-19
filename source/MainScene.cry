@@ -1,0 +1,218 @@
+import Graphics2D;
+import Graphics2DText;
+import Math;
+import TwoCansAlpha2;
+
+const DIGITS = 18;
+
+// UI
+
+const X_RES = 640;
+const Y_RES = 480;
+
+const SOROBAN_WIDTH = BEAD_WIDTH * DIGITS;
+
+const SOROBAN_BORDER = (X_RES - SOROBAN_WIDTH) / 2;
+
+const BUTTON_HEIGHT = 52;
+const CLEAR_BUTTON_WIDTH = 148;
+const TOGGLE_VALUE_LABEL_WIDTH = 132;
+
+const LABEL_HEIGHT = 52;
+const LABEL_X_BORDER = 16;
+const LABEL_Y_BORDER = 0;
+
+const INDEX_INDICATOR_SIZE = 16;
+const INDEX_INDICATOR_BORDER = 5;
+
+const DIGIT_MARKER_SIZE = RECKONING_BAR_HEIGHT / 2;
+
+class MainScene : AbstractScene {
+	field mouseDown = false;
+
+	// UI
+
+	field uiElements;
+	field rods;
+
+	field clearButton;
+	field toggleValueLabel;
+	field valueLabel;
+
+	field index;
+
+	function reset() {
+		for (element : this.uiElements) {
+			element.enabled = true;
+		}
+		for (rod : this.rods) {
+			rod.clear();
+		}
+		this.index = DIGITS - 1;
+	}
+
+	constructor() : base() {
+		this.uiElements = [];
+		this.rods = [];
+
+		// Rods
+		for (i = 0; i < DIGITS; ++i) {
+			rod = new Rod(SOROBAN_BORDER + i * BEAD_WIDTH, SOROBAN_BORDER);
+			this.uiElements.add(rod);
+			this.rods.add(rod);
+		}
+
+		// Clear button
+		this.clearButton = new Button
+			( SOROBAN_BORDER, Y_RES - SOROBAN_BORDER - BUTTON_HEIGHT
+			, CLEAR_BUTTON_WIDTH, BUTTON_HEIGHT
+			, "Clear (Space)"
+			);
+		this.clearButton.hotkey = KeyboardKey.SPACE;
+		this.uiElements.add(this.clearButton);
+
+		// Toggle value label
+		this.toggleValueLabel = new Toggle
+			( SOROBAN_BORDER, Y_RES - 2 * SOROBAN_BORDER - 2 * BUTTON_HEIGHT
+			, TOGGLE_VALUE_LABEL_WIDTH, BUTTON_HEIGHT
+			, "Show # (H)", "Hide # (H)"
+			);
+		this.toggleValueLabel.hotkey = KeyboardKey.H;
+		this.uiElements.add(this.toggleValueLabel);
+
+		// Current value label
+		this.valueLabel = new Label
+			( X_RES - SOROBAN_BORDER
+			, Y_RES - SOROBAN_BORDER
+			, LABEL_X_BORDER, LABEL_Y_BORDER
+			, "", 24
+			, [0, 0, 0]
+			, [255, 255, 255, 128]
+			);
+		this.valueLabel.horizontalOffset = -1;
+		this.valueLabel.verticalOffset = -1;
+		this.uiElements.add(this.valueLabel);
+
+		this.reset();
+	}
+
+	function update(inputManager, events) {
+		for (e : events) {
+			switch (e.type) {
+				case EventType.MOUSE_RELEASE:
+					this.mouseDown = false;
+					break;
+				case EventType.MOUSE_PRESS:
+					this.mouseDown = true;
+					break;
+				default:
+					break;
+			}
+		}
+
+		// Update UI uiElements.
+		for (element : this.uiElements) {
+			element.update(inputManager, events);
+		}
+
+		// Clear soroban.
+		if (this.clearButton.clicked) {
+			for (rod : this.rods) {
+				rod.clear();
+			}
+		}
+
+		// Keyboard controls
+		if (inputManager.isKeyPressedThisFrame(KeyboardKey.LEFT)) {
+			this.index = (this.index - 1) % DIGITS;
+			Sounds.click.play();
+		}
+		if (inputManager.isKeyPressedThisFrame(KeyboardKey.RIGHT)) {
+			this.index = (this.index + 1) % DIGITS;
+			Sounds.click.play();
+		}
+		if (inputManager.isKeyPressedThisFrame(KeyboardKey.UP)) {
+			if (inputManager.isKeyPressed(KeyboardKey.R)) {
+				this.rods[this.index].setHeavenBead(false);
+			} else if (inputManager.isKeyPressed(KeyboardKey.E)) {
+				this.rods[this.index].addEarthBeads(4);
+			} else if (inputManager.isKeyPressed(KeyboardKey.W)) {
+				this.rods[this.index].addEarthBeads(3);
+			} else if (inputManager.isKeyPressed(KeyboardKey.Q)) {
+				this.rods[this.index].addEarthBeads(2);
+			} else {
+				this.rods[this.index].addEarthBeads(1);
+			}
+		}
+		if (inputManager.isKeyPressedThisFrame(KeyboardKey.DOWN)) {
+			if (inputManager.isKeyPressed(KeyboardKey.R)) {
+				this.rods[this.index].setHeavenBead(true);
+			} else if (inputManager.isKeyPressed(KeyboardKey.E)) {
+				this.rods[this.index].addEarthBeads(-4);
+			} else if (inputManager.isKeyPressed(KeyboardKey.W)) {
+				this.rods[this.index].addEarthBeads(-3);
+			} else if (inputManager.isKeyPressed(KeyboardKey.Q)) {
+				this.rods[this.index].addEarthBeads(-2);
+			} else {
+				this.rods[this.index].addEarthBeads(-1);
+			}
+		}
+
+		for (i = 0; i < DIGITS; ++i) {
+			if (this.rods[i].clicked) {
+				this.index = i;
+			}
+		}
+
+		// Hide/show value label.
+		this.valueLabel.visible = this.toggleValueLabel.on;
+
+		// Update value label if visible.
+		if (this.valueLabel.visible) {
+			foundNonZero = false;
+			totalValue = "";
+			for (i = 0; i < this.rods.length; ++i) {
+				value = this.rods[i].value();
+				if (value != 0) {
+					foundNonZero = true;
+				}
+				if (foundNonZero) {
+					totalValue += value;
+				}
+			}
+			if (totalValue == "") totalValue = "0";
+			this.valueLabel.setText(totalValue);			
+		}
+	}
+
+	function render() {
+		Graphics2D.Draw.fill(192, 192, 192);
+
+		// Draw table background.
+		Images.get("table.png").draw(0, 0);
+
+		// Draw soroban background.
+		Images.get("soroban-background.png").draw(0, 0);
+
+		// Draw UI uiElements.
+		for (element : this.uiElements) {
+			element.draw();
+		}
+
+		// Draw digit markers.
+		for (i = 0; i < DIGITS; i += 3) {
+			Graphics2D.Draw.ellipse
+				( SOROBAN_BORDER + BEAD_WIDTH * i + (BEAD_WIDTH - DIGIT_MARKER_SIZE) / 2
+				, SOROBAN_BORDER + 2 * BEAD_HEIGHT + (RECKONING_BAR_HEIGHT - DIGIT_MARKER_SIZE) / 2
+				, DIGIT_MARKER_SIZE, DIGIT_MARKER_SIZE
+				, 0, 0, 0
+				);
+		}
+
+		// Draw rod index indicator.
+		Images.get("selector.png").draw
+			( SOROBAN_BORDER + BEAD_WIDTH * this.index + (BEAD_WIDTH - INDEX_INDICATOR_SIZE) / 2
+			, ROD_HEIGHT + 2 * SOROBAN_BORDER + INDEX_INDICATOR_BORDER
+			);
+	}
+}

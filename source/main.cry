@@ -1,0 +1,5 @@
+﻿import TwoCansAlpha2;
+
+function main() {
+	TwoCansAlpha2.startGame();
+}

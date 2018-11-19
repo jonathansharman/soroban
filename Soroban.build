@@ -1,0 +1,73 @@
+﻿<build>
+	<projectname>Soroban</projectname>
+	<title>Soroban</title>
+	<description>Practice the Japanese abacus.</description>
+	<icon>assets/icon32.png,assets/icon256.png</icon>
+
+	<crayonpath>C:\Users\jonat\Documents\programming\crayon\TwoCansSDK</crayonpath>
+	<source>source</source>
+	<compilerlocale>en</compilerlocale>
+	<output>output/%TARGET_NAME%</output>
+
+	<imagesheets>
+		<sheet id="twocans_everything">
+			<prefix>*</prefix>
+		</sheet>
+	</imagesheets>
+	
+	<guidseed>com.jsharman.Soroban,v1,%TARGET_NAME%</guidseed>
+
+    <var type="string">
+      <id>game_title</id>
+      <value>Soroban</value>
+    </var>
+    
+    <var type="string">
+      <id>initial_scene</id>
+      <value>MainScene</value>
+    </var>
+    
+    <var type="integer">
+      <id>screen_width</id>
+      <value>640</value>
+    </var>
+    
+    <var type="integer">
+      <id>screen_height</id>
+      <value>480</value>
+    </var>
+	
+    <var type="boolean">
+      <id>use_60_fps</id>
+      <value>false</value>
+    </var>
+	
+    <var type="boolean">
+      <id>enable_wasd</id>
+      <value>true</value>
+    </var>
+	
+	<target name="csharp">
+		<platform>csharp-app</platform>
+	</target>
+	
+	<target name="java">
+		<platform>java-app</platform>
+	</target>
+	
+	<target name="python">
+		<platform>python-app</platform>
+	</target>
+	
+	<target name="ios">
+		<platform>javascript-app-ios</platform>
+	</target>
+
+	<target name="android">
+		<platform>javascript-app-android</platform>
+	</target>
+	
+	<target name="javascript">
+		<platform>javascript-app</platform>
+	</target>
+</build>
