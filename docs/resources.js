@@ -1,0 +1,3 @@
+﻿C$common$addTextRes('image_sheets.txt', "S,0,twocans_everything\nC,0,0\nT,t1.png,0,0,256,256,0\nI,0,0,6,150,rod.png\nI,6,0,34,20,bead.png\nI,40,0,16,16,selector.png\nI,56,0,34,10,reckoning.png\nC,640,178\nT,t2.png,0,0,640,178,42\nI,0,0,640,178,soroban-background.png\nC,640,480\nT,t3.png,0,0,640,480,42\nI,0,0,640,480,table.png");
+C$common$resourceManifest = "IMGSH,bead.png,,twocans_everything\nIMGSH,reckoning.png,,twocans_everything\nIMGSH,rod.png,,twocans_everything\nIMGSH,selector.png,,twocans_everything\nIMGSH,soroban-background.png,,twocans_everything\nIMGSH,table.png,,twocans_everything\nSND,click.ogg,snd1.ogg";
+C$common$jsFilePrefix = "";
