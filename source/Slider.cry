@@ -1,5 +1,5 @@
 import Graphics2D;
-import TwoCansAlpha2;
+import TwoCansAlpha4;
 
 const SLIDER_BORDER = 3;
 const SLIDER_DELTA = 0.025;

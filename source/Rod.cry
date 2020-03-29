@@ -1,7 +1,7 @@
 import Graphics2D;
 import Graphics2DText;
 import Math;
-import TwoCansAlpha2;
+import TwoCansAlpha4;
 
 const ROD_WIDTH = 6;
 const BEAD_WIDTH = 34;
