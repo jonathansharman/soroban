@@ -1,7 +1,7 @@
 import Graphics2D;
 import Graphics2DText;
 import Math;
-import TwoCansAlpha2;
+import TwoCansAlpha4;
 
 const DIGITS = 18;
 

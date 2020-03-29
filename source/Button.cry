@@ -1,6 +1,6 @@
 import Graphics2D;
 import Graphics2DText;
-import TwoCansAlpha2;
+import TwoCansAlpha4;
 
 const BUTTON_FONT_SIZE = 16;
 const BUTTON_BORDER = 1;
